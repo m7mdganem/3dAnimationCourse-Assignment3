@@ -446,15 +446,7 @@ Eigen::Vector3f BasicScene::GetSpherePos()
 void BasicScene::RotateLinkIfPickedOrScene(Eigen::Transpose<Eigen::Matrix3f> system, float x, float y, float z)
 {
     if (pickedModel == cyls[pickedIndex])
-    {
-        if (((x > 0.0f || x < 0.0f) && (y > 0.0f || y < 0.0f)) ||
-            ((x > 0.0f || x < 0.0f) && (z > 0.0f || z < 0.0f)) ||
-            ((y > 0.0f || y < 0.0f) && (z > 0.0f || z < 0.0f)))
-        {
-            std::cout << "cannot rotate" << std::endl;
-            return;
-        }
-        
+    {        
         Eigen::Matrix3f link_rotation = pickedModel->GetRotation();
         Eigen::Vector3f euler_angles = link_rotation.eulerAngles(0, 1, 2);
 
@@ -545,9 +537,9 @@ void BasicScene::CCD()
         float RE_RD_dot_product = RE_normalized.dot(RD_normalized);
         float angle = -1 < RE_RD_dot_product && RE_RD_dot_product < 1 ? acosf(RE_RD_dot_product) : RE_RD_dot_product > 1 ? acosf(1.0f) : acosf(-1.0f);
 
-        Eigen::Vector3f normal = (RE_normalized.cross(RD_normalized)).normalized();
+        Eigen::Vector3f normal = RE_normalized.cross(RD_normalized);
 
-        Eigen::Vector3f rotation_vector = (cyls[link_index]->GetRotation().transpose() * normal).normalized();
+        Eigen::Vector3f rotation_vector = cyls[link_index]->GetRotation().transpose() * normal;
         cyls[link_index]->Rotate(angle / 60.0f, rotation_vector);
     }
 }
